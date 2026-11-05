@@ -12,3 +12,6 @@ jobs:
       - run: node --check serve.mjs
       - run: node --test
       - run: node pivot.mjs example.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser

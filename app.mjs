@@ -2,8 +2,8 @@ import { assess } from './geometry.mjs';
 const defaults = {length:200,width:80,door:90,corridorA:100,corridorB:100,uncertainty:2,margin:0};
 const form = document.querySelector('#form'), svg = document.querySelector('#diagram');
 const fields = Object.keys(defaults);
-function values(){ return Object.fromEntries(fields.map(k => [k, form.elements[k].value === '' ? NaN : Number(form.elements[k].value)])); }
-function setValues(p){ for (const k of fields) form.elements[k].value = p[k]; update(); }
+function values(){ return Object.fromEntries(fields.map(k => { const input = form.elements.namedItem(k); return [k, input.value === '' ? NaN : Number(input.value)]; })); }
+function setValues(p){ for (const k of fields) form.elements.namedItem(k).value = p[k]; update(); }
 function update(){
   const p=values();
   try {

@@ -1,6 +1,6 @@
-# Pivot: route research prototype
+# Pivot
 
-Pivot is an experimental offline visual study for a rigid rectangular item, a clear doorway, and an ideal 90-degree corridor. It detects two necessary-condition failures; every other case is **unknown**, not a fit or route. This alpha is not evidence of product demand or safe moving.
+Pivot checks two limits for a rigid rectangular item, a clear doorway and an ideal right-angle corridor. It can rule out a case within that model. Other results are **unknown** and need separate assessment. The app runs locally and shows a schematic and measurement checklist.
 
 ## Try it
 
@@ -14,11 +14,11 @@ Open the printed loopback address and press Ctrl+C to stop. Change the numeric f
 
 Run `node --check app.mjs`, `node --check serve.mjs`, `node --test` and `node pivot.mjs example.json` to verify the source and command-line example.
 
-For the browser regression check, run `npm ci`, `npx playwright install chromium`, then `npm run test:browser`. This checks initialized measurements and the diagram, door changes, project save/import, and desktop/mobile layout. Browser tooling is only a development dependency; running Pivot still requires no packages. Set `PIVOT_BROWSER_CHANNEL` to `msedge` or `chrome` to use an installed browser instead.
+For the browser regression check, run `npm ci`, `npx playwright install chromium`, then `npm run test:browser`. This covers the initial diagram, door changes, saving and opening a project, a manual edit made during an import, and desktop and mobile layouts. Browser tooling is a development dependency. Set `PIVOT_BROWSER_CHANNEL` to `msedge` or `chrome` to use an installed browser.
 
 ## Method and limitations
 
-Uncertainty is a non-negative absolute error applied independently to each measurement. Margin is added to all sides of the item. The door check compares the smallest possible item dimension plus twice the margin against the largest possible clear opening. The turn check compares the smallest possible long dimension plus twice the margin against the ideal zero-thickness line bound `(a^(2/3) + b^(2/3))^(3/2)` for infinite unobstructed corridors of the largest possible widths. A rectangle with its margin contains a line of that length, so failing this optimistic bound rules it out in the ideal model. Passing either check does not provide a path. This assumes a rigid rectangle moving at floor level through the complete opening and right-angle turn.
+Uncertainty is a non-negative absolute error applied independently to each measurement. Margin is added to all sides of the item. The door check compares the smallest possible item dimension plus twice the margin against the largest possible clear opening. The turn check compares the smallest possible long dimension plus twice the margin against the ideal zero-thickness line bound `(a^(2/3) + b^(2/3))^(3/2)` for infinite unobstructed corridors of the largest possible widths. A rectangle with its margin contains a line of that length, so failing this optimistic bound rules it out in the ideal model. Each comparison uses a small floating-point tolerance near equality. Inputs that overflow the calculation produce an error. Passing either check does not provide a path. This assumes a rigid rectangle moving at floor level through the complete opening and right-angle turn.
 
 There is no path search, swept-path drawing, Roomshift integration, arbitrary route segments, obstacles, finite corridor lengths, door thickness, stairs, height, tilt, lifting, weight or handling assessment. Measure protrusions and real clearances. Do not use this result to establish safety or whether a real move is possible. Missing or invalid input is rejected rather than guessed.
 

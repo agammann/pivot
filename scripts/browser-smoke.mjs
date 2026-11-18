@@ -45,6 +45,22 @@ try {
   await page.waitForFunction(() => document.querySelector('[name=length]').value === '100');
   assert.equal(await page.locator('#result').innerText(), 'Unknown');
   assert.equal(await page.locator('#error').innerText(), '');
+
+  await page.evaluate(() => {
+    const original = File.prototype.text;
+    File.prototype.text = function () {
+      File.prototype.text = original;
+      return new Promise(resolve => {
+        window.finishPivotTestRead = () => resolve(original.call(this));
+      });
+    };
+  });
+  await page.locator('#file').setInputFiles({name: 'older.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({...imported, length: 110}))});
+  await page.locator('[name=length]').fill('105');
+  await page.evaluate(() => window.finishPivotTestRead());
+  await page.waitForFunction(() => document.querySelector('#file').files.length === 0);
+  assert.equal(await page.locator('[name=length]').inputValue(), '105');
+  assert.equal(await page.locator('#result').innerText(), 'Unknown');
   assert.deepEqual(errors, []);
   for (const [width, height] of [[1440, 1000], [390, 844]]) {
     await page.setViewportSize({ width, height });
@@ -54,7 +70,7 @@ try {
       await page.screenshot({ path: path.join(process.env.PIVOT_SCREENSHOT_DIR, `pivot-${width}.png`) });
     }
   }
-  console.log('PASS: initialized defaults and diagram, door check, save/import, desktop/mobile layout, no page errors');
+  console.log('PASS: initialized defaults and diagram, door check, save/import, newer edit retained, desktop/mobile layout, no page errors');
 } finally {
   if (browser) await browser.close();
   server.kill();

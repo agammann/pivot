@@ -13,3 +13,17 @@ test('rejects uncertainty that consumes the item', () => assert.throws(() => ass
 test('margin can rule out a marginal opening', () => assert.match(assess({...base,margin:8}).reasons[0], /doorway/));
 test('rejects negative margin', () => assert.throws(() => assess({...base,margin:-1})));
 
+test('floating-point rounding cannot rule out a case at either model bound', () => {
+  const turn = {...base, length:125, width:12, corridorA:27, corridorB:64, uncertainty:0};
+  assert.equal(assess(turn).result, 'unknown');
+  assert.match(assess({...turn, length:125.01}).reasons[0], /L-turn/);
+
+  const door = {...base, length:1, width:0.1, door:0.3, margin:0.1, uncertainty:0};
+  assert.equal(assess(door).result, 'unknown');
+  assert.match(assess({...door, door:0.299}).reasons[0], /doorway/);
+});
+
+test('unrepresentable calculation ranges are rejected instead of producing a result', () => {
+  assert.throws(() => assess({...base, corridorA:1e308, corridorB:1e308}), /finite calculation range/);
+});
+

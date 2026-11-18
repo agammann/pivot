@@ -13,7 +13,9 @@ export function assess(p) {
   const long = Math.max(p.length, p.width) - u + 2*m;
   const a = p.corridorA + u, b = p.corridorB + u;
   const door = p.door + u;
-  const limit = (a ** (2/3) + b ** (2/3)) ** (3/2);
+  const scale = Math.max(a, b);
+  const ratio = Math.min(a, b) / scale;
+  const limit = scale * (1 + ratio ** (2/3)) ** (3/2);
   if (![short, long, door, limit].every(Number.isFinite)) throw new Error('Measurements exceed the finite calculation range.');
   const reasons = [];
   if (exceedsBound(short, door)) reasons.push('Even the smallest item plus margin exceeds the widest possible doorway.');

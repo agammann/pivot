@@ -17,6 +17,10 @@ test('floating-point rounding cannot rule out a case at either model bound', () 
   const turn = {...base, length:125, width:12, corridorA:27, corridorB:64, uncertainty:0};
   assert.equal(assess(turn).result, 'unknown');
   assert.match(assess({...turn, length:125.01}).reasons[0], /L-turn/);
+  for (const scale of [1e-100, 1e100, 1e280]) {
+    const scaled = Object.fromEntries(Object.entries(turn).map(([field, value]) => [field, value * scale]));
+    assert.equal(assess(scaled).result, 'unknown');
+  }
 
   const door = {...base, length:1, width:0.1, door:0.3, margin:0.1, uncertainty:0};
   assert.equal(assess(door).result, 'unknown');
